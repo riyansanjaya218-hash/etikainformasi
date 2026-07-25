@@ -10,6 +10,7 @@ export type SectionId =
   | 'unit-5'
   | 'kuis-akhir'
   | 'cek-fakta'
+  | 'uji-kemiripan'
   | 'certificate'
   | 'umpan-balik'
   | 'print-pdf'
@@ -21,6 +22,7 @@ export interface ParticipantAccessLog {
   studentName: string;
   studentClass: string;
   studentInstitution: string;
+  studentEmail?: string;
   accessedAt: string;
   lastVisitedSection: string;
   completedSectionsCount: number;
@@ -35,6 +37,7 @@ export interface ParticipantFeedback {
   studentName: string;
   studentClass: string;
   studentInstitution: string;
+  studentEmail?: string;
   submittedAt: string;
   ratings: Record<number, number>;
   avgRating: number;
@@ -49,6 +52,16 @@ export interface QuizQuestion {
   options: string[];
   correctAnswer: number; // 0, 1, 2, 3
   explanation?: string;
+}
+
+export interface VideoConfigItem {
+  id: string; // 'intro' | 'unit-1' | 'unit-2' | 'unit-3' | 'unit-4' | 'unit-5'
+  sectionName: string;
+  title: string;
+  youtubeUrl: string;
+  embedUrl: string;
+  duration: string;
+  summary: string;
 }
 
 export interface UnitInfo {
@@ -84,6 +97,7 @@ export interface UserProgress {
   studentName: string;
   studentClass: string;
   studentInstitution: string;
+  studentEmail?: string;
   badges: string[];
   lastVisited: SectionId;
 }
@@ -103,3 +117,18 @@ export interface SearchResultItem {
   title: string;
   snippet: string;
 }
+
+export interface CertificateConfig {
+  institutionName: string;
+  programTitle: string;
+  certificateTitle: string;
+  subTitle: string;
+  logoUrl?: string;
+  instructorName: string;
+  instructorRole: string;
+  signatureUrl?: string;
+  stampUrl?: string;
+  issueCity: string;
+  certificatePrefix: string;
+}
+

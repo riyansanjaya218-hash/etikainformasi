@@ -18,7 +18,7 @@ import {
   MessageCircle,
   Share2
 } from 'lucide-react';
-import { SectionId, UnitInfo, UserProgress, QuizQuestion } from '../types';
+import { SectionId, UnitInfo, UserProgress, QuizQuestion, VideoConfigItem } from '../types';
 import { 
   UNIT_1_QUIZ, 
   UNIT_2_QUIZ, 
@@ -43,6 +43,7 @@ interface UnitViewProps {
   onSaveFilterShareScore: (score: number) => void;
   onSaveNote: (sectionId: string, text: string) => void;
   onCompleteUnit: (unitId: SectionId) => void;
+  videoOverride?: VideoConfigItem;
 }
 
 export const UnitView: React.FC<UnitViewProps> = ({
@@ -54,7 +55,8 @@ export const UnitView: React.FC<UnitViewProps> = ({
   onSaveChecklistScore,
   onSaveFilterShareScore,
   onSaveNote,
-  onCompleteUnit
+  onCompleteUnit,
+  videoOverride
 }) => {
 
   // Select quiz questions based on unit number
@@ -157,34 +159,45 @@ export const UnitView: React.FC<UnitViewProps> = ({
       </div>
 
       {/* Video Intro Section */}
-      <div className="bg-[#F9F7F2] dark:bg-[#1A1A18] p-6 border border-stone-300 dark:border-stone-800 space-y-4">
-        <div className="flex items-center gap-3 border-b border-stone-300 dark:border-stone-800 pb-3">
-          <div className="p-2.5 bg-[#1A1A1A] text-white dark:bg-stone-200 dark:text-black">
-            <Video className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="text-[10px] uppercase tracking-wider font-bold text-amber-700 dark:text-amber-400">Video Pengantar Unit</span>
-            <h3 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-base sm:text-lg">
-              {unit.videoInfo.title}
-            </h3>
-          </div>
-        </div>
+      {(() => {
+        const currentVideo = videoOverride ? {
+          title: videoOverride.title,
+          embedPlaceholder: videoOverride.embedUrl,
+          duration: videoOverride.duration,
+          summary: videoOverride.summary
+        } : unit.videoInfo;
 
-        <div className="aspect-video w-full bg-black overflow-hidden border border-stone-300 dark:border-stone-800">
-          <iframe
-            className="w-full h-full"
-            src={unit.videoInfo.embedPlaceholder}
-            title={unit.videoInfo.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
+        return (
+          <div className="bg-[#F9F7F2] dark:bg-[#1A1A18] p-6 border border-stone-300 dark:border-stone-800 space-y-4">
+            <div className="flex items-center gap-3 border-b border-stone-300 dark:border-stone-800 pb-3">
+              <div className="p-2.5 bg-[#1A1A1A] text-white dark:bg-stone-200 dark:text-black">
+                <Video className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-amber-700 dark:text-amber-400">Video Pengantar Unit</span>
+                <h3 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-base sm:text-lg">
+                  {currentVideo.title}
+                </h3>
+              </div>
+            </div>
 
-        <div className="bg-[#E9E4DB] dark:bg-[#22211F] p-3.5 text-xs text-stone-800 dark:text-stone-300 space-y-1 border-l-4 border-stone-800 dark:border-stone-400">
-          <p><span className="font-bold text-stone-900 dark:text-stone-100">Durasi Video:</span> {unit.videoInfo.duration}</p>
-          <p><span className="font-bold text-stone-900 dark:text-stone-100">Ringkasan Materi:</span> {unit.videoInfo.summary}</p>
-        </div>
-      </div>
+            <div className="aspect-video w-full bg-black overflow-hidden border border-stone-300 dark:border-stone-800">
+              <iframe
+                className="w-full h-full"
+                src={currentVideo.embedPlaceholder}
+                title={currentVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="bg-[#E9E4DB] dark:bg-[#22211F] p-3.5 text-xs text-stone-800 dark:text-stone-300 space-y-1 border-l-4 border-stone-800 dark:border-stone-400">
+              <p><span className="font-bold text-stone-900 dark:text-stone-100">Durasi Video:</span> {currentVideo.duration}</p>
+              <p><span className="font-bold text-stone-900 dark:text-stone-100">Ringkasan Materi:</span> {currentVideo.summary}</p>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* MAIN CONCEPT MATERIAL CONTENT (Custom tailored per Unit from PDF) */}
       

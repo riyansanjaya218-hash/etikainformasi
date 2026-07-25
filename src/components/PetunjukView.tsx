@@ -16,9 +16,21 @@ import { SectionId } from '../types';
 
 interface PetunjukViewProps {
   onSelectSection: (sectionId: SectionId) => void;
+  videoInfo?: {
+    embedUrl: string;
+    title: string;
+    duration: string;
+    summary: string;
+  };
 }
 
-export const PetunjukView: React.FC<PetunjukViewProps> = ({ onSelectSection }) => {
+export const PetunjukView: React.FC<PetunjukViewProps> = ({ onSelectSection, videoInfo }) => {
+  const video = videoInfo || {
+    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    title: 'Video Perkenalan E-Modul “Jelajah Digital”',
+    duration: '3:45 menit',
+    summary: 'Penjelasan latar belakang e-modul, gambaran 5 unit interaktif, serta pesan moral pentingnya generasi kritis di era banjir informasi.'
+  };
 
   const symbols = [
     { icon: BookOpen, symbol: '📖 Materi', color: 'text-blue-600 bg-blue-50', desc: 'Baca dan pahami penjelasan konsep utama' },
@@ -113,7 +125,7 @@ export const PetunjukView: React.FC<PetunjukViewProps> = ({ onSelectSection }) =
           </div>
           <div>
             <span className="text-xs font-semibold text-purple-200 uppercase tracking-wider">Video Pengantar E-Modul</span>
-            <h3 className="text-lg font-bold text-white">Video Perkenalan E-Modul “Jelajah Digital”</h3>
+            <h3 className="text-lg font-bold text-white">{video.title}</h3>
           </div>
         </div>
 
@@ -121,16 +133,16 @@ export const PetunjukView: React.FC<PetunjukViewProps> = ({ onSelectSection }) =
         <div className="aspect-video w-full rounded-xl bg-slate-950 border border-white/10 overflow-hidden flex flex-col items-center justify-center relative group shadow-inner">
           <iframe
             className="w-full h-full"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-            title="Video Perkenalan E-Modul Jelajah Digital"
+            src={video.embedUrl}
+            title={video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 text-xs sm:text-sm space-y-1">
-          <p><span className="font-semibold text-purple-200">Durasi:</span> 3:45 menit</p>
-          <p><span className="font-semibold text-purple-200">Ringkasan isi video:</span> Penjelasan latar belakang e-modul, gambaran 5 unit interaktif, serta pesan moral pentingnya generasi kritis di era banjir informasi.</p>
+          <p><span className="font-semibold text-purple-200">Durasi:</span> {video.duration}</p>
+          <p><span className="font-semibold text-purple-200">Ringkasan isi video:</span> {video.summary}</p>
         </div>
       </div>
 

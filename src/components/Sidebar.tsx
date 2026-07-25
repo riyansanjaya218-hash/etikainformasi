@@ -12,7 +12,9 @@ import {
   Bookmark,
   ChevronRight,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  FileSearch,
+  Lock
 } from 'lucide-react';
 import { SectionId, UserProgress } from '../types';
 import { UNITS_DATA, BADGES_LIST } from '../data/modulData';
@@ -32,20 +34,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose
 }) => {
+  const hasIdentity = Boolean(userProgress.studentName && userProgress.studentName.trim().length > 0);
 
   const navItems = [
     { id: 'cover', label: 'Halaman Sampul', icon: BookOpen, badge: null },
-    { id: 'kata-pengantar', label: 'Kata Pengantar', icon: FileText, badge: null },
-    { id: 'petunjuk', label: 'Petunjuk Penggunaan', icon: HelpCircle, badge: null },
-    { id: 'peta-konsep', label: 'Peta Konsep & Alur', icon: Map, badge: null },
-    { id: 'cek-fakta', label: 'Fitur Cek Fakta Online', icon: ShieldCheck, badge: 'Fitur AI' },
+    { id: 'kata-pengantar', label: 'Kata Pengantar', icon: FileText, badge: !hasIdentity ? 'Terkunci' : null },
+    { id: 'petunjuk', label: 'Petunjuk Penggunaan', icon: HelpCircle, badge: !hasIdentity ? 'Terkunci' : null },
+    { id: 'peta-konsep', label: 'Peta Konsep & Alur', icon: Map, badge: !hasIdentity ? 'Terkunci' : null },
+    { id: 'cek-fakta', label: 'Fitur Cek Fakta Online', icon: ShieldCheck, badge: !hasIdentity ? 'Terkunci' : 'Fitur AI' },
   ];
 
   const bottomItems = [
-    { id: 'kuis-akhir', label: 'Kuis Akhir & Evaluasi', icon: Sparkles, badge: userProgress.finalQuizScore !== null ? `${userProgress.finalQuizScore}/100` : null },
-    { id: 'certificate', label: 'Sertifikat Kelulusan', icon: Award, badge: userProgress.finalQuizScore !== null && userProgress.finalQuizScore >= 70 ? 'Tersedia' : 'Terkunci' },
-    { id: 'umpan-balik', label: 'Umpan Balik Modul', icon: MessageSquare, badge: null },
-    { id: 'print-pdf', label: 'Download Modul (PDF)', icon: Printer, badge: 'Luring' },
+    { id: 'kuis-akhir', label: 'Kuis Akhir & Evaluasi', icon: Sparkles, badge: !hasIdentity ? 'Terkunci' : (userProgress.finalQuizScore !== null ? `${userProgress.finalQuizScore}/100` : null) },
+    { id: 'certificate', label: 'Sertifikat Kelulusan', icon: Award, badge: !hasIdentity ? 'Terkunci' : (userProgress.finalQuizScore !== null && userProgress.finalQuizScore >= 70 ? 'Tersedia' : 'Terkunci') },
+    { id: 'umpan-balik', label: 'Umpan Balik Modul', icon: MessageSquare, badge: !hasIdentity ? 'Terkunci' : null },
+    { id: 'print-pdf', label: 'Download Modul (PDF)', icon: Printer, badge: !hasIdentity ? 'Terkunci' : (userProgress.finalQuizScore !== null && userProgress.finalQuizScore >= 70 ? 'Tersedia' : 'Terkunci') },
   ];
 
   return (
@@ -75,22 +78,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Student Profile Card - Editorial Callout */}
-          <div className="bg-[#E9E4DB] dark:bg-[#1E1E1C] p-3.5 border-l-4 border-[#1A1A1A] dark:border-stone-200 text-[#1A1A1A] dark:text-stone-100 space-y-2">
+          <div className={`p-3.5 border-l-4 space-y-2 transition-all ${
+            !hasIdentity 
+              ? 'bg-amber-100/80 dark:bg-amber-950/60 border-amber-600 text-amber-950 dark:text-amber-200' 
+              : 'bg-[#E9E4DB] dark:bg-[#1E1E1C] border-[#1A1A1A] dark:border-stone-200 text-[#1A1A1A] dark:text-stone-100'
+          }`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#1A1A1A] dark:bg-stone-200 text-[#F9F7F2] dark:text-[#1A1A1A] flex items-center justify-center font-serif font-bold text-xs">
-                {userProgress.studentName ? userProgress.studentName.charAt(0).toUpperCase() : 'S'}
+              <div className="w-8 h-8 rounded-full bg-[#1A1A1A] dark:bg-stone-200 text-[#F9F7F2] dark:text-[#1A1A1A] flex items-center justify-center font-serif font-bold text-xs shrink-0">
+                {userProgress.studentName ? userProgress.studentName.charAt(0).toUpperCase() : <Lock className="w-3.5 h-3.5 text-amber-400" />}
               </div>
               <div className="flex-1 min-w-0">
-                <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-stone-500 dark:text-stone-400 block">Siswa / Peserta</span>
-                <p className="text-xs font-serif font-bold truncate">{userProgress.studentName || 'Siswa Indonesia'}</p>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-stone-500 dark:text-stone-400 block">
+                  {hasIdentity ? 'Peserta Terdaftar' : 'Status Akses'}
+                </span>
+                <p className="text-xs font-serif font-bold truncate">
+                  {userProgress.studentName || 'Belum Mengisi Identitas'}
+                </p>
               </div>
             </div>
-            <div className="pt-2 border-t border-stone-300 dark:border-stone-800 flex items-center justify-between text-[10px] uppercase tracking-wider font-bold text-stone-600 dark:text-stone-400">
-              <span>Lencana:</span>
-              <span className="font-serif italic text-xs text-[#1A1A1A] dark:text-stone-200">
-                {userProgress.badges.length} / {BADGES_LIST.length}
-              </span>
-            </div>
+            {!hasIdentity ? (
+              <p className="text-[10px] text-amber-900 dark:text-amber-300 font-sans font-bold leading-tight pt-1.5 border-t border-amber-300/80 dark:border-amber-800 flex items-center gap-1">
+                <Lock className="w-3 h-3 shrink-0 text-amber-700 dark:text-amber-400" />
+                <span>Isi identitas di Sampul untuk membuka modul</span>
+              </p>
+            ) : (
+              <div className="pt-2 border-t border-stone-300 dark:border-stone-800 flex items-center justify-between text-[10px] uppercase tracking-wider font-bold text-stone-600 dark:text-stone-400">
+                <span>Lencana:</span>
+                <span className="font-serif italic text-xs text-[#1A1A1A] dark:text-stone-200">
+                  {userProgress.badges.length} / {BADGES_LIST.length}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Navigation Group 1: General */}
@@ -167,9 +185,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           {unit.title}
                         </span>
                       </div>
-                      {isCompleted && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
-                      )}
+                      <div className="flex items-center gap-1">
+                        {!hasIdentity && (
+                          <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                        )}
+                        {isCompleted && (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
+                        )}
+                      </div>
                     </div>
                     <div className="mt-1 pl-6 flex items-center justify-between text-[10px] uppercase tracking-wider text-stone-500 dark:text-stone-400">
                       <span className="truncate">{unit.subtitle}</span>

@@ -11,8 +11,8 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   onLoginSuccess,
   onReturnToApp
 }) => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -89,17 +89,6 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             <span>{error}</span>
           </div>
         )}
-
-        {/* Demo Credentials Alert Box */}
-        <div className="p-4 bg-stone-900 border border-stone-800 space-y-1.5 text-xs text-stone-300 font-sans">
-          <div className="flex items-center gap-1.5 font-bold text-amber-300 uppercase tracking-wider text-[11px]">
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>Kredensial Login Bawaan Admin:</span>
-          </div>
-          <p className="font-mono text-[11px] bg-stone-950 p-2 border border-stone-800 text-stone-200">
-            Username: <strong className="text-amber-400">admin</strong> &nbsp;|&nbsp; Password: <strong className="text-amber-400">admin123</strong>
-          </p>
-        </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>

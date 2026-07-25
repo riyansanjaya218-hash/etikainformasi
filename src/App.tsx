@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SectionId, UserProgress } from './types';
+import { SectionId, UserProgress, VideoConfigItem } from './types';
 import { UNITS_DATA, BADGES_LIST } from './data/modulData';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -13,6 +13,7 @@ import { CertificateView } from './components/CertificateView';
 import { UmpanBalikView } from './components/UmpanBalikView';
 import { PrintPDFView } from './components/PrintPDFView';
 import { CekFaktaView } from './components/CekFaktaView';
+import { UjiKemiripanView } from './components/UjiKemiripanView';
 import { AdminLoginView } from './components/AdminLoginView';
 import { AdminDashboardView } from './components/AdminDashboardView';
 import { SearchModal } from './components/SearchModal';
@@ -33,6 +34,7 @@ const INITIAL_PROGRESS: UserProgress = {
   studentName: '',
   studentClass: '',
   studentInstitution: 'Literasi Digital Indonesia',
+  studentEmail: '',
   badges: [],
   lastVisited: 'cover'
 };
@@ -54,6 +56,27 @@ export default function App() {
   const [isAiTutorOpen, setIsAiTutorOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
+  const [videosConfig, setVideosConfig] = useState<VideoConfigItem[]>([]);
+  const [identityNotice, setIdentityNotice] = useState<string | null>(null);
+
+  // Fetch YouTube Videos Config
+  const fetchVideosConfig = async () => {
+    try {
+      const res = await fetch('/api/videos-config');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.videos)) {
+          setVideosConfig(data.videos);
+        }
+      }
+    } catch (e) {
+      console.error('Error fetching videos config:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchVideosConfig();
+  }, [currentSection]);
 
   // Save progress to localStorage
   useEffect(() => {
@@ -74,6 +97,17 @@ export default function App() {
   }, [darkMode]);
 
   const handleSelectSection = (sectionId: SectionId) => {
+    const isAdmin = typeof window !== 'undefined' && Boolean(localStorage.getItem('admin_token'));
+    const hasIdentity = Boolean(userProgress.studentName && userProgress.studentName.trim().length > 0);
+
+    if (!isAdmin && sectionId !== 'cover' && sectionId !== 'admin-login' && sectionId !== 'admin-dashboard' && !hasIdentity) {
+      setCurrentSection('cover');
+      setIdentityNotice('⚠️ Mohon maaf, Anda tidak dapat membaca dan mengerjakan modul sebelum mengisikan & menyimpan Identitas Peserta pada formulir di Halaman Sampul.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    setIdentityNotice(null);
     setCurrentSection(sectionId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -88,12 +122,14 @@ export default function App() {
     }
   };
 
-  const handleUpdateProfile = (name: string, studentClass: string) => {
+  const handleUpdateProfile = (name: string, studentClass: string, studentEmail?: string) => {
     setUserProgress(prev => ({
       ...prev,
       studentName: name,
-      studentClass
+      studentClass,
+      studentEmail: studentEmail || prev.studentEmail || ''
     }));
+    setIdentityNotice(null);
   };
 
   const handleSaveUnitScore = (unitId: string, score: number) => {
@@ -179,6 +215,7 @@ export default function App() {
         studentName: userProgress.studentName,
         studentClass: userProgress.studentClass || 'Umum',
         studentInstitution: userProgress.studentInstitution || 'Literasi Digital Indonesia',
+        studentEmail: userProgress.studentEmail || '',
         lastVisitedSection: currentSection,
         completedSectionsCount: completedCount,
         progressPercent,
@@ -187,7 +224,7 @@ export default function App() {
         deviceInfo: `${navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop'} Browser`
       })
     }).catch(err => console.error('Access log sync error:', err));
-  }, [userProgress.studentName, userProgress.studentClass, userProgress.completedSections, userProgress.finalQuizScore, currentSection]);
+  }, [userProgress.studentName, userProgress.studentClass, userProgress.studentEmail, userProgress.completedSections, userProgress.finalQuizScore, currentSection]);
 
   const handleAdminLoginSuccess = () => {
     setCurrentSection('admin-dashboard');
@@ -242,6 +279,7 @@ export default function App() {
               onSelectSection={handleSelectSection}
               userProgress={userProgress}
               onUpdateProfile={handleUpdateProfile}
+              identityNotice={identityNotice}
             />
           )}
 
@@ -250,7 +288,10 @@ export default function App() {
           )}
 
           {currentSection === 'petunjuk' && (
-            <PetunjukView onSelectSection={handleSelectSection} />
+            <PetunjukView 
+              onSelectSection={handleSelectSection} 
+              videoInfo={videosConfig.find(v => v.id === 'intro')}
+            />
           )}
 
           {currentSection === 'peta-konsep' && (
@@ -271,6 +312,7 @@ export default function App() {
               onSaveFilterShareScore={handleSaveFilterShareScore}
               onSaveNote={handleSaveNote}
               onCompleteUnit={handleCompleteUnit}
+              videoOverride={videosConfig.find(v => v.id === currentSection)}
             />
           )}
 
@@ -286,6 +328,10 @@ export default function App() {
             <CekFaktaView onSelectSection={handleSelectSection} />
           )}
 
+          {currentSection === 'uji-kemiripan' && (
+            <UjiKemiripanView onSelectSection={handleSelectSection} />
+          )}
+
           {currentSection === 'certificate' && (
             <CertificateView userProgress={userProgress} />
           )}
@@ -295,7 +341,11 @@ export default function App() {
           )}
 
           {currentSection === 'print-pdf' && (
-            <PrintPDFView onSelectSection={handleSelectSection} />
+            <PrintPDFView 
+              onSelectSection={handleSelectSection} 
+              videosConfig={videosConfig}
+              userProgress={userProgress}
+            />
           )}
 
           {currentSection === 'admin-login' && (

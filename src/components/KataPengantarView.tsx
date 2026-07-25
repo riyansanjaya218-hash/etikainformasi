@@ -38,7 +38,7 @@ export const KataPengantarView: React.FC<KataPengantarProps> = ({ onSelectSectio
         <div className="bg-blue-50 dark:bg-blue-950/50 rounded-xl p-5 border border-blue-200 dark:border-blue-800 space-y-3">
           <div className="flex items-center gap-2 text-blue-900 dark:text-blue-200 font-bold text-sm">
             <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <span>Hasil Survei Kebutuhan 100+ Responden (Mahasiswa & Pelajar)</span>
+            <span>Hasil Survei Kebutuhan 100+ Responden (Siswa, Mahasiswa, Pendidik & Masyarakat Umum)</span>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
             Hasil survei kebutuhan menunjukkan bahwa responden sangat membutuhkan panduan praktis untuk:
@@ -82,9 +82,9 @@ export const KataPengantarView: React.FC<KataPengantarProps> = ({ onSelectSectio
               <Building2 className="w-6 h-6" />
             </div>
             <div>
-              <p className="font-bold text-slate-900 dark:text-white text-sm">Tim Penyusun & Pengembang</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Pengembangan Literasi Digital</p>
-              <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">E-Modul Etika Informasi (2026)</p>
+              <p className="font-bold text-slate-900 dark:text-white text-sm">Tim Dosen Prodi Perpustakaan dan Sains Informasi FIP UNJ</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Penyusun & Pengembang E-Modul Etika Informasi</p>
+              <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Riyan Sanjaya, M.Hum.</p>
             </div>
           </div>
 

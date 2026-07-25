@@ -1,20 +1,53 @@
-import React, { useRef } from 'react';
-import { Award, Printer, Lock, Download, CheckCircle2 } from 'lucide-react';
-import { UserProgress } from '../types';
+import React, { useRef, useState, useEffect } from 'react';
+import { Award, Printer, Lock, ShieldCheck } from 'lucide-react';
+import { UserProgress, CertificateConfig } from '../types';
 
 interface CertificateViewProps {
   userProgress: UserProgress;
+  overrideConfig?: CertificateConfig;
 }
 
-export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress }) => {
+const DEFAULT_CONFIG: CertificateConfig = {
+  institutionName: "Tim Dosen Prodi Perpustakaan dan Sains Informasi FIP UNJ",
+  programTitle: "PROGRAM PEMBELAJARAN ETIKA INFORMASI",
+  certificateTitle: "SERTIFIKAT KELULUSAN",
+  subTitle: "E-Modul Etika Informasi Berbasis Literasi Digital",
+  logoUrl: "",
+  instructorName: "Riyan Sanjaya, M.Hum.",
+  instructorRole: "Tim Dosen Prodi Perpustakaan dan Sains Informasi FIP UNJ",
+  signatureUrl: "",
+  stampUrl: "",
+  issueCity: "Jakarta, Indonesia",
+  certificatePrefix: "EMOD-LITDIG"
+};
+
+export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, overrideConfig }) => {
   const certRef = useRef<HTMLDivElement>(null);
+  const [config, setConfig] = useState<CertificateConfig>(overrideConfig || DEFAULT_CONFIG);
+
+  useEffect(() => {
+    if (overrideConfig) {
+      setConfig(overrideConfig);
+      return;
+    }
+
+    fetch('/api/certificate-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.config) {
+          setConfig(data.config);
+        }
+      })
+      .catch(err => console.error('Error fetching cert config:', err));
+  }, [overrideConfig]);
+
   const isPassed = userProgress.finalQuizScore !== null && userProgress.finalQuizScore >= 70;
 
   const handlePrintCertificate = () => {
     window.print();
   };
 
-  if (!isPassed) {
+  if (!isPassed && !overrideConfig) {
     return (
       <div className="max-w-xl mx-auto my-12 p-8 bg-[#F9F7F2] dark:bg-[#1A1A18] border border-stone-300 dark:border-stone-800 text-center space-y-4 font-sans">
         <div className="w-16 h-16 bg-[#1A1A1A] text-white dark:bg-stone-200 dark:text-black flex items-center justify-center mx-auto">
@@ -44,60 +77,70 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress }
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-16 font-sans">
       
-      {/* Top Action Bar */}
-      <div className="flex items-center justify-between no-print border-b border-stone-300 dark:border-stone-800 pb-3">
-        <div className="flex items-center gap-2">
-          <Award className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-          <h2 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
-            Sertifikat Kelulusan Resmi
-          </h2>
-        </div>
+      {/* Top Action Bar (Hidden when override/preview) */}
+      {!overrideConfig && (
+        <div className="flex items-center justify-between no-print border-b border-stone-300 dark:border-stone-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Award className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+            <h2 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
+              Sertifikat Kelulusan Resmi
+            </h2>
+          </div>
 
-        <button
-          onClick={handlePrintCertificate}
-          className="px-5 py-2.5 bg-[#1A1A1A] hover:bg-stone-800 text-white dark:bg-stone-200 dark:text-black font-bold uppercase tracking-widest text-xs shadow-md transition-all flex items-center gap-2"
-        >
-          <Printer className="w-4 h-4" />
-          <span>Cetak / Simpan PDF Sertifikat</span>
-        </button>
-      </div>
+          <button
+            onClick={handlePrintCertificate}
+            className="px-5 py-2.5 bg-[#1A1A1A] hover:bg-stone-800 text-white dark:bg-stone-200 dark:text-black font-bold uppercase tracking-widest text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Cetak / Simpan PDF Sertifikat</span>
+          </button>
+        </div>
+      )}
 
       {/* CERTIFICATE CANVAS (Printable Diploma Editorial Format) */}
       <div 
         ref={certRef}
-        className="bg-[#F9F7F2] text-stone-900 p-8 sm:p-14 border-8 border-double border-stone-800 shadow-2xl relative overflow-hidden space-y-8 text-center"
+        className="bg-[#F9F7F2] text-stone-900 p-8 sm:p-12 border-8 border-double border-stone-800 shadow-2xl relative overflow-hidden space-y-6 text-center"
       >
-        {/* Certificate Header */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-12 h-12 bg-[#1A1A1A] text-white border border-stone-800 flex items-center justify-center font-serif font-black text-xl">
-              EM
-            </div>
+        {/* Certificate Header with Logo */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-center gap-3 min-h-[64px]">
+            {config.logoUrl ? (
+              <img 
+                src={config.logoUrl} 
+                alt="Logo Instansi" 
+                className="h-16 w-auto max-w-[200px] object-contain drop-shadow-xs"
+              />
+            ) : (
+              <div className="w-14 h-14 bg-[#1A1A1A] text-white border-2 border-amber-600 flex items-center justify-center font-serif font-black text-2xl shadow-md">
+                EM
+              </div>
+            )}
           </div>
-          <h3 className="text-xs font-serif font-bold uppercase tracking-[0.25em] text-stone-800">
-            LITERASI DIGITAL INDONESIA
+          <h3 className="text-xs sm:text-sm font-serif font-bold uppercase tracking-[0.25em] text-stone-800">
+            {config.institutionName || 'LITERASI DIGITAL INDONESIA'}
           </h3>
-          <p className="text-[10px] text-stone-600 font-bold uppercase tracking-widest">
-            PROGRAM PEMBELAJARAN ETIKA INFORMASI (2026)
+          <p className="text-[10px] sm:text-xs text-stone-600 font-bold uppercase tracking-widest">
+            {config.programTitle || 'PROGRAM PEMBELAJARAN ETIKA INFORMASI'}
           </p>
         </div>
 
         <div className="py-3 border-y-2 border-stone-800 space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-serif font-black tracking-tight text-stone-950 uppercase">
-            SERTIFIKAT KELULUSAN
+          <h1 className="text-2xl sm:text-4xl font-serif font-black tracking-tight text-stone-950 uppercase">
+            {config.certificateTitle || 'SERTIFIKAT KELULUSAN'}
           </h1>
           <p className="text-xs font-serif italic font-bold text-amber-800 tracking-wider uppercase">
-            E-Modul Etika Informasi Berbasis Literasi Digital
+            {config.subTitle || 'E-Modul Etika Informasi Berbasis Literasi Digital'}
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <p className="text-xs text-stone-600 font-serif italic">Diberikan kepada:</p>
-          <h2 className="text-2xl sm:text-4xl font-serif font-black text-stone-950 underline decoration-amber-600 decoration-2 underline-offset-8">
-            {userProgress.studentName || 'Siswa / Mahasiswa Indonesia'}
+          <h2 className="text-2xl sm:text-3xl font-serif font-black text-stone-950 underline decoration-amber-600 decoration-2 underline-offset-8">
+            {userProgress.studentName || 'Peserta Literasi Digital Indonesia'}
           </h2>
           <p className="text-xs font-bold text-stone-600 pt-1">
-            {userProgress.studentClass || 'Pendidikan & Literasi Digital Indonesia'}
+            {userProgress.studentClass || 'Masyarakat Umum & Pelajar Indonesia'}
           </p>
         </div>
 
@@ -105,30 +148,71 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress }
           Telah berhasil menyelesaikan seluruh rangkaian materi, studi kasus, simulasi verifikasi hoaks, dan dinyatakan <span className="font-bold text-emerald-800">LULUS EVALUASI AKHIR</span> dengan nilai memuaskan:
         </div>
 
-        <div className="inline-block px-6 py-2.5 bg-[#E9E4DB] border-2 border-stone-800 text-base font-serif font-black text-stone-950">
-          SKOR EVALUASI: {userProgress.finalQuizScore} / 100 POIN
+        <div className="inline-block px-6 py-2 bg-[#E9E4DB] border-2 border-stone-800 text-sm sm:text-base font-serif font-black text-stone-950">
+          SKOR EVALUASI: {userProgress.finalQuizScore ?? 100} / 100 POIN
         </div>
 
-        {/* Footer Signatures */}
-        <div className="pt-8 border-t border-stone-300 grid grid-cols-2 gap-8 text-xs font-serif text-stone-800">
-          <div className="space-y-1 text-center">
-            <p className="text-[11px] text-stone-500 font-sans">Indonesia, {currentDate}</p>
-            <div className="h-12 flex items-center justify-center font-serif text-stone-400 italic">
-              [ Cap & Tanda Tangan Digital ]
+        {/* Footer Signatures, Stamp & Serial Number */}
+        <div className="pt-6 border-t border-stone-300 grid grid-cols-2 gap-6 items-end text-xs font-serif text-stone-800">
+          
+          {/* Instruktur & Tanda Tangan */}
+          <div className="space-y-1 text-center flex flex-col items-center justify-end min-h-[120px]">
+            <p className="text-[11px] text-stone-500 font-sans">
+              {config.issueCity || 'Indonesia'}, {currentDate}
+            </p>
+            
+            {/* Signature Area */}
+            <div className="h-14 flex items-center justify-center my-1">
+              {config.signatureUrl ? (
+                <img 
+                  src={config.signatureUrl} 
+                  alt="Tanda Tangan Instruktur" 
+                  className="h-14 w-auto max-w-[160px] object-contain"
+                />
+              ) : (
+                <div className="font-serif text-amber-900 italic font-bold text-lg tracking-widest border-b border-dashed border-stone-400 px-4 py-1">
+                  ~ RiyanSanjaya ~
+                </div>
+              )}
             </div>
-            <p className="font-bold text-stone-950">Tim Penyusun & Pengembang</p>
-            <p className="text-[10px] text-stone-600">E-Modul Etika Informasi</p>
+
+            <p className="font-bold text-stone-950 text-xs sm:text-sm">{config.instructorName || 'Riyan Sanjaya, M.Hum.'}</p>
+            <p className="text-[10px] text-stone-600">{config.instructorRole || 'Tim Dosen Prodi Perpustakaan dan Sains Informasi FIP UNJ'}</p>
           </div>
 
-          <div className="space-y-1 text-center">
-            <p className="text-[11px] text-stone-500 font-sans">Nomor Sertifikat:</p>
-            <p className="font-mono font-bold text-stone-900">EMOD-LITDIG-2026-{(userProgress.studentName || 'STD').slice(0,3).toUpperCase()}-77</p>
-            <div className="h-10 flex items-center justify-center font-sans">
-              <span className="px-2 py-0.5 border border-emerald-700 bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wider">
-                ✓ VERIFIED DIGITALLY
+          {/* Stempel Instansi & Serial Number */}
+          <div className="space-y-2 text-center flex flex-col items-center justify-end min-h-[120px]">
+            
+            {/* Stamp Area */}
+            <div className="h-16 flex items-center justify-center">
+              {config.stampUrl ? (
+                <img 
+                  src={config.stampUrl} 
+                  alt="Stempel Instansi" 
+                  className="h-16 w-auto max-w-[120px] object-contain opacity-90 rotate-[-4deg]"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full border-2 border-dashed border-amber-800 text-amber-800 flex flex-col items-center justify-center text-[8px] font-bold leading-tight rotate-[-6deg] bg-amber-50/50 p-1">
+                  <ShieldCheck className="w-4 h-4 text-amber-700 mb-0.5" />
+                  <span>STEMPEL RESMI</span>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-0.5">
+              <p className="text-[10px] text-stone-500 font-sans uppercase tracking-wider">Nomor Sertifikat:</p>
+              <p className="font-mono font-bold text-stone-900 text-xs">
+                {(config.certificatePrefix || 'EMOD-LITDIG')}-2026-{(userProgress.studentName || 'STD').slice(0,3).toUpperCase()}-77
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center">
+              <span className="px-2 py-0.5 border border-emerald-700 bg-emerald-50 text-emerald-800 text-[9px] font-bold tracking-wider uppercase font-sans">
+                ✓ TERVERIFIKASI RESMI
               </span>
             </div>
           </div>
+
         </div>
 
       </div>
@@ -136,3 +220,4 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress }
     </div>
   );
 };
+

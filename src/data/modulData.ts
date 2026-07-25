@@ -70,7 +70,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 3: Data Pribadimu, Harta Berharga di Dunia Digital',
-      embedPlaceholder: 'https://youtu.be/nbt7Kw7KLmQ?si=XDRaNz6ui7HjNlxm',
+      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
       duration: '6:10 menit',
       summary: 'Penjelasan mengenai pentingnya kerahasiaan data pribadi, bahaya phishing dan social engineering, serta cara mengamankan akun.'
     },
@@ -98,7 +98,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 4: Menghargai Karya, Menjunjung Integritas',
-      embedPlaceholder: 'https://youtu.be/WpUPtt9HXDM',
+      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
       duration: '5:45 menit',
       summary: 'Mengapa kejujuran akademik sangat penting dan bagaimana memanfaatkan teknologi AI tanpa melakukan tindakan plagiarisme.'
     },
@@ -126,7 +126,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 5: Bijak Bersosial Media di Ruang Publik Digital',
-      embedPlaceholder: 'https://youtu.be/4R-inMIruos',
+      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
       duration: '4:50 menit',
       summary: 'Etika bersosialisasi online, menghentikan rantai perundungan siber, dan membangun komunikasi yang inklusif.'
     },
