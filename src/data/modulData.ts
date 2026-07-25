@@ -98,7 +98,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 4: Menghargai Karya, Menjunjung Integritas',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://www.youtube.com/watch?v=4R-inMIruos',
       duration: '5:45 menit',
       summary: 'Mengapa kejujuran akademik sangat penting dan bagaimana memanfaatkan teknologi AI tanpa melakukan tindakan plagiarisme.'
     },
@@ -126,7 +126,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 5: Bijak Bersosial Media di Ruang Publik Digital',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://www.youtube.com/watch?v=G1vPXGTN_SM',
       duration: '4:50 menit',
       summary: 'Etika bersosialisasi online, menghentikan rantai perundungan siber, dan membangun komunikasi yang inklusif.'
     },
