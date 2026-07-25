@@ -1,0 +1,6 @@
+{
+  "name": "E-Modul Etika Informasi berbasis Literasi Digital",
+  "description": "E-Modul Interaktif Etika Informasi Berbasis Literasi Digital - Dilengkapi Fitur Cek Fakta Online Interaktif, Kuis, Simulation Game, dan PDF Luring.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
