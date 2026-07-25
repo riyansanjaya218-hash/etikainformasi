@@ -1,4 +1,5 @@
 import React from 'react';
+import { UniversalVideoPlayer } from './UniversalVideoPlayer';
 import { 
   HelpCircle, 
   BookOpen, 
@@ -131,12 +132,9 @@ export const PetunjukView: React.FC<PetunjukViewProps> = ({ onSelectSection, vid
 
         {/* Responsive Video Container */}
         <div className="aspect-video w-full rounded-xl bg-slate-950 border border-white/10 overflow-hidden flex flex-col items-center justify-center relative group shadow-inner">
-          <iframe
-            className="w-full h-full"
-            src={video.embedUrl}
+          <UniversalVideoPlayer
+            url={(video as any).youtubeUrl || video.embedUrl}
             title={video.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
           />
         </div>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { UniversalVideoPlayer } from './UniversalVideoPlayer';
 import { 
   Users, 
   MessageSquare, 
@@ -63,6 +64,14 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedParticipant, setSelectedParticipant] = useState<ParticipantAccessLog | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+
+  // Quick Submit Video Form State
+  const [submitTargetId, setSubmitTargetId] = useState<string>('intro');
+  const [submitVideoTitle, setSubmitVideoTitle] = useState<string>('');
+  const [submitVideoUrl, setSubmitVideoUrl] = useState<string>('');
+  const [submitVideoDuration, setSubmitVideoDuration] = useState<string>('');
+  const [submitVideoSummary, setSubmitVideoSummary] = useState<string>('');
+  const [isUploadingVideo, setIsUploadingVideo] = useState<boolean>(false);
 
   // YouTube Videos Management State
   const [videosList, setVideosList] = useState<VideoConfigItem[]>([
@@ -297,6 +306,81 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       alert('Gagal terhubung dengan server API saat menyimpan video.');
     } finally {
       setIsSavingVideos(false);
+    }
+  };
+
+  const handleUploadVideoFile = (file: File, targetSetter?: (url: string) => void) => {
+    if (!file) return;
+    if (file.size > 100 * 1024 * 1024) {
+      alert('Ukuran file video terlalu besar (maksimal 100MB). Disarankan menggunakan link YouTube, Google Drive, atau OneDrive.');
+      return;
+    }
+
+    setIsUploadingVideo(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
+        if (targetSetter) {
+          targetSetter(result);
+        } else {
+          setSubmitVideoUrl(result);
+        }
+        setNotification(`✓ File video "${file.name}" berhasil dimuat & siap diputar!`);
+        setTimeout(() => setNotification(null), 4000);
+      }
+      setIsUploadingVideo(false);
+    };
+    reader.onerror = () => {
+      alert('Gagal membaca file video dari perangkat.');
+      setIsUploadingVideo(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleQuickSubmitVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!submitVideoUrl.trim()) {
+      alert('Silakan masukkan link URL video atau unggah file video terlebih dahulu.');
+      return;
+    }
+
+    const targetItem = videosList.find(x => x.id === submitTargetId);
+    const updatedVideos = videosList.map(v => {
+      if (v.id === submitTargetId) {
+        return {
+          ...v,
+          title: submitVideoTitle.trim() || v.title,
+          youtubeUrl: submitVideoUrl.trim(),
+          embedUrl: formatUniversalVideoEmbedUrl(submitVideoUrl.trim()),
+          duration: submitVideoDuration.trim() || v.duration || '0:00 menit',
+          summary: submitVideoSummary.trim() || v.summary || ''
+        };
+      }
+      return v;
+    });
+
+    setVideosList(updatedVideos);
+
+    try {
+      const res = await fetch('/api/videos-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videos: updatedVideos })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setNotification(`✓ Video berhasil disubmit dan dipasang pada "${targetItem?.sectionName || submitTargetId}"! Video dapat langsung diputar.`);
+        setSubmitVideoTitle('');
+        setSubmitVideoUrl('');
+        setSubmitVideoDuration('');
+        setSubmitVideoSummary('');
+        setTimeout(() => setNotification(null), 5000);
+      } else {
+        alert(data.error || 'Gagal menyubmit video.');
+      }
+    } catch (err) {
+      alert('Gagal menyambung ke server saat menyubmit video.');
     }
   };
 
@@ -1597,6 +1681,148 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
           </div>
 
+          {/* Quick Submit Video Baru Form */}
+          <div className="bg-stone-900 text-stone-100 p-5 rounded-xl border border-amber-500/40 shadow-md space-y-4 font-sans">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
+                  <Upload className="w-5 h-5" />
+                </span>
+                <div>
+                  <h4 className="font-serif font-bold text-base text-amber-400">
+                    Form Submit & Unggah Video Modul
+                  </h4>
+                  <p className="text-xs text-stone-400">
+                    Submit video baru (Link YouTube, Google Drive, OneDrive, atau Unggah File Video MP4) dan uji pemutaran video secara langsung.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30">
+                Submit Video
+              </span>
+            </div>
+
+            <form onSubmit={handleQuickSubmitVideo} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-300 mb-1">
+                    1. Pilih Target Unit E-Modul:
+                  </label>
+                  <select
+                    value={submitTargetId}
+                    onChange={(e) => setSubmitTargetId(e.target.value)}
+                    className="w-full px-3 py-2 bg-stone-950 border border-stone-700 rounded text-xs text-stone-100 focus:border-amber-500 focus:outline-none"
+                  >
+                    {videosList.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.sectionName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-300 mb-1">
+                    2. Judul Tampilan Video:
+                  </label>
+                  <input
+                    type="text"
+                    value={submitVideoTitle}
+                    onChange={(e) => setSubmitVideoTitle(e.target.value)}
+                    placeholder="Contoh: Video Pengantar Unit 1 Etika Informasi..."
+                    className="w-full px-3 py-2 bg-stone-950 border border-stone-700 rounded text-xs text-stone-100 focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-300 mb-1">
+                  3. Sumber Video (Tempel Link atau Unggah File MP4):
+                </label>
+                <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                  <input
+                    type="text"
+                    value={submitVideoUrl}
+                    onChange={(e) => setSubmitVideoUrl(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=... / Drive / OneDrive / MP4 Link"
+                    className="flex-1 px-3 py-2 bg-stone-950 border border-stone-700 rounded text-xs text-stone-100 font-mono focus:border-amber-500 focus:outline-none"
+                  />
+                  <label className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs rounded cursor-pointer shrink-0 flex items-center justify-center gap-1.5 transition-colors">
+                    <Upload className="w-4 h-4" />
+                    <span>{isUploadingVideo ? 'Memuat Video...' : 'Unggah File Video (.mp4)'}</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleUploadVideoFile(file);
+                      }}
+                    />
+                  </label>
+                </div>
+                <p className="text-[11px] text-stone-400 mt-1">
+                  💡 Bisa menempel URL YouTube, Google Drive, OneDrive, atau mengunggah file video dari komputer/HP.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-300 mb-1">
+                    Durasi Video:
+                  </label>
+                  <input
+                    type="text"
+                    value={submitVideoDuration}
+                    onChange={(e) => setSubmitVideoDuration(e.target.value)}
+                    placeholder="Contoh: 04:15 menit"
+                    className="w-full px-3 py-2 bg-stone-950 border border-stone-700 rounded text-xs text-stone-100 font-mono focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-stone-300 mb-1">
+                    Ringkasan Catatan Video:
+                  </label>
+                  <input
+                    type="text"
+                    value={submitVideoSummary}
+                    onChange={(e) => setSubmitVideoSummary(e.target.value)}
+                    placeholder="Penjelasan ringkas poin materi dalam video..."
+                    className="w-full px-3 py-2 bg-stone-950 border border-stone-700 rounded text-xs text-stone-100 focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Interactive Video Player Tester */}
+              {submitVideoUrl && (
+                <div className="p-3 bg-stone-950 rounded-lg border border-stone-800 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-amber-400 flex items-center gap-1.5">
+                      <Play className="w-3.5 h-3.5 fill-current" /> Pratinjau Uji Pemutaran Video Langsung:
+                    </span>
+                    <span className="text-[10px] text-stone-400">Pastikan video dapat diputar sebelum disubmit</span>
+                  </div>
+                  <div className="aspect-video w-full bg-black rounded overflow-hidden border border-stone-800 relative">
+                    <UniversalVideoPlayer
+                      url={submitVideoUrl}
+                      title={submitVideoTitle || 'Pratinjau Video'}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isUploadingVideo || !submitVideoUrl}
+                className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 text-stone-950 font-bold text-xs uppercase tracking-wider rounded shadow transition-all flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Submit & Pasang Video Ke Modul</span>
+              </button>
+            </form>
+          </div>
+
           <div className="bg-amber-50 dark:bg-amber-950/40 p-4 border-l-4 border-amber-600 text-xs text-amber-900 dark:text-amber-200 space-y-2">
             <p className="font-bold flex items-center gap-1.5 text-sm font-serif">
               <Sparkles className="w-4 h-4 text-amber-600" /> Panduan & Format Link Video Universal:
@@ -1615,8 +1841,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                 <span>Tempel link penyematan (embed) atau link berbagi video OneDrive/SharePoint instansi Anda.</span>
               </div>
               <div className="p-2 bg-amber-100/60 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800">
-                <span className="font-bold block text-amber-950 dark:text-amber-100">🌐 Video Web / Direct MP4 / Embed:</span>
-                <span>Tempel URL video langsung (.mp4) atau URL penyematan iframe dari platform apapun.</span>
+                <span className="font-bold block text-amber-950 dark:text-amber-100">🌐 Video Web / Direct MP4 / Upload File:</span>
+                <span>Tempel URL video langsung (.mp4) atau unggah file video langsung dari komputer/HP Anda.</span>
               </div>
             </div>
           </div>
@@ -1624,7 +1850,6 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           <form onSubmit={handleSaveVideos} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {videosList.map((item, index) => {
-                const embedPreviewUrl = formatUniversalVideoEmbedUrl(item.youtubeUrl);
                 return (
                   <div 
                     key={item.id} 
@@ -1648,9 +1873,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                     <div className="space-y-3 text-xs">
                       <div>
                         <label className="block font-bold text-stone-800 dark:text-stone-200 mb-1 font-serif">
-                          Link URL Video (YouTube / GDrive / OneDrive / Web):
+                          Link URL Video / File Video:
                         </label>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col sm:flex-row items-stretch gap-2">
                           <input
                             type="text"
                             value={item.youtubeUrl}
@@ -1659,14 +1884,33 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                               updated[index] = { ...updated[index], youtubeUrl: e.target.value };
                               setVideosList(updated);
                             }}
-                            placeholder="https://www.youtube.com/watch?v=... atau Google Drive / OneDrive link"
-                            className="w-full px-3 py-2 bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 font-mono text-xs focus:outline-none focus:border-amber-600"
+                            placeholder="https://www.youtube.com/watch?v=... atau GDrive / OneDrive / MP4 URL"
+                            className="flex-1 px-3 py-2 bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 font-mono text-xs focus:outline-none focus:border-amber-600"
                           />
+                          <label className="p-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded cursor-pointer shrink-0 flex items-center justify-center gap-1">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Unggah</span>
+                            <input
+                              type="file"
+                              accept="video/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  handleUploadVideoFile(file, (url) => {
+                                    const updated = [...videosList];
+                                    updated[index] = { ...updated[index], youtubeUrl: url };
+                                    setVideosList(updated);
+                                  });
+                                }
+                              }}
+                            />
+                          </label>
                           <a
-                            href={embedPreviewUrl}
+                            href={formatUniversalVideoEmbedUrl(item.youtubeUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 border border-stone-300 dark:border-stone-700 shrink-0"
+                            className="p-2 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 border border-stone-300 dark:border-stone-700 shrink-0 flex items-center justify-center"
                             title="Buka Link Video"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -1729,16 +1973,13 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
                       {/* Live Video Embedded Player Box */}
                       <div className="pt-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
-                          Pratinjau Pemutar Video Live:
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block mb-1">
+                          Pratinjau Pemutar Video Live (Bisa Diputar Langsung):
                         </span>
-                        <div className="aspect-video w-full bg-black border border-stone-300 dark:border-stone-800 overflow-hidden relative">
-                          <iframe
-                            className="w-full h-full"
-                            src={embedPreviewUrl}
+                        <div className="aspect-video w-full bg-black border border-stone-300 dark:border-stone-800 overflow-hidden relative rounded">
+                          <UniversalVideoPlayer
+                            url={item.youtubeUrl || item.embedUrl}
                             title={item.title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
                           />
                         </div>
                       </div>

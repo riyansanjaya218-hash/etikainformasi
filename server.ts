@@ -6,7 +6,8 @@ import { GoogleGenAI } from "@google/genai";
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // In-memory data store for Access Logs & Feedback Entries
 let accessLogs: Array<{
@@ -295,6 +296,21 @@ app.post("/api/videos-config", (req, res) => {
     success: true,
     message: "Daftar video YouTube modul berhasil diperbarui!",
     videos: videosConfig
+  });
+});
+
+// Upload Video File Endpoint
+app.post("/api/upload-video", (req, res) => {
+  const { videoData, fileName } = req.body;
+  if (!videoData) {
+    return res.status(400).json({ error: "Data video tidak ditemukan." });
+  }
+
+  return res.json({
+    success: true,
+    message: "Video berhasil diunggah!",
+    url: videoData,
+    fileName: fileName || "uploaded_video.mp4"
   });
 });
 

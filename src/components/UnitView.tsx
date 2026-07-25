@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { UniversalVideoPlayer } from './UniversalVideoPlayer';
 import { 
   BookOpen, 
   Target, 
@@ -182,12 +183,9 @@ export const UnitView: React.FC<UnitViewProps> = ({
             </div>
 
             <div className="aspect-video w-full bg-black overflow-hidden border border-stone-300 dark:border-stone-800">
-              <iframe
-                className="w-full h-full"
-                src={currentVideo.embedPlaceholder}
+              <UniversalVideoPlayer
+                url={(videoOverride as any)?.youtubeUrl || currentVideo.embedPlaceholder}
                 title={currentVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
               />
             </div>
 
