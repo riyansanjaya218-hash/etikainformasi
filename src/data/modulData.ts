@@ -15,7 +15,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 1: Mengapa Etika Informasi Penting di Era Digital?',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://drive.google.com/file/d/1iJYlVbE6mH172AIPuzvfAr_Rja2N81KLuLIQ29OWzBc/preview',
       duration: '4:15 menit',
       summary: 'Video perkenalan mengenai pentingnya etika informasi, dampak pelanggaran di era internet, dan tanggung jawab kita sebagai warga digital.'
     },
@@ -43,7 +43,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 2: Yuk, Jadi Detektif Informasi!',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://drive.google.com/file/d/1nwk7Ebr_iX365uBz_qQoWvJZvf4PEPtDcyVV-tkko4g/preview',
       duration: '5:30 menit',
       summary: 'Panduan menjadi detektif informasi yang kritis, mengenali manipulasi konten AI, dan menguasai teknik verifikasi cepat.'
     },
@@ -70,7 +70,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 3: Data Pribadimu, Harta Berharga di Dunia Digital',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://drive.google.com/file/d/1LSm-r3m-8XfPNVPKQhJDA1ssE_Z1Mz1O/preview',
       duration: '6:10 menit',
       summary: 'Penjelasan mengenai pentingnya kerahasiaan data pribadi, bahaya phishing dan social engineering, serta cara mengamankan akun.'
     },
@@ -98,7 +98,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 4: Menghargai Karya, Menjunjung Integritas',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://drive.google.com/file/d/1pPkvpjgkP8TiMCvG4KGXE77qwQK9cp1i/preview',
       duration: '5:45 menit',
       summary: 'Mengapa kejujuran akademik sangat penting dan bagaimana memanfaatkan teknologi AI tanpa melakukan tindakan plagiarisme.'
     },
@@ -126,7 +126,7 @@ export const UNITS_DATA: UnitInfo[] = [
     ],
     videoInfo: {
       title: 'Pengantar Unit 5: Bijak Bersosial Media di Ruang Publik Digital',
-      embedPlaceholder: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      embedPlaceholder: 'https://drive.google.com/file/d/1OYjuuE2gLto5N_osLOs3iv64qUI090kk/preview',
       duration: '4:50 menit',
       summary: 'Etika bersosialisasi online, menghentikan rantai perundungan siber, dan membangun komunikasi yang inklusif.'
     },
