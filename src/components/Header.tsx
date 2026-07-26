@@ -11,7 +11,9 @@ import {
   Award,
   CheckCircle2,
   Menu,
-  ShieldCheck
+  ShieldCheck,
+  LogOut,
+  User
 } from 'lucide-react';
 import { SectionId, UserProgress } from '../types';
 
@@ -26,6 +28,7 @@ interface HeaderProps {
   onToggleDarkMode: () => void;
   fontSize: 'normal' | 'large' | 'xlarge';
   onChangeFontSize: (size: 'normal' | 'large' | 'xlarge') => void;
+  onParticipantLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,8 +41,10 @@ export const Header: React.FC<HeaderProps> = ({
   darkMode,
   onToggleDarkMode,
   fontSize,
-  onChangeFontSize
+  onChangeFontSize,
+  onParticipantLogout
 }) => {
+  const hasIdentity = Boolean(userProgress.studentName && userProgress.studentName.trim().length > 0);
   // Calculate completion percentage
   const totalSections = 9; // unit 1-5, cover, kata pengantar, petunjuk, peta konsep
   const completedCount = userProgress.completedSections.length;
@@ -170,6 +175,19 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-stone-800" />}
           </button>
+
+          {/* Participant Logout Button */}
+          {hasIdentity && onParticipantLogout && (
+            <button
+              onClick={onParticipantLogout}
+              className="px-2.5 py-1.5 rounded-md text-[11px] uppercase tracking-wider font-bold flex items-center gap-1.5 transition-colors bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 dark:bg-rose-950/80 dark:hover:bg-rose-900 dark:text-rose-200 dark:border-rose-800"
+              title={`Peserta: ${userProgress.studentName} — Klik untuk Keluar / Logout`}
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <span className="hidden lg:inline truncate max-w-[90px]">{userProgress.studentName}</span>
+              <span className="text-[9px] font-mono font-bold text-rose-700 dark:text-rose-300">(Logout)</span>
+            </button>
+          )}
 
           {/* Admin Login Button */}
           <button
