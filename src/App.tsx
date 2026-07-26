@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SectionId, UserProgress, VideoConfigItem } from './types';
+import { getLocalVideosConfig, saveLocalVideosConfig } from './utils/videoStorage';
 import { UNITS_DATA, BADGES_LIST } from './data/modulData';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -59,18 +60,26 @@ export default function App() {
   const [videosConfig, setVideosConfig] = useState<VideoConfigItem[]>([]);
   const [identityNotice, setIdentityNotice] = useState<string | null>(null);
 
-  // Fetch YouTube Videos Config
+  // Fetch YouTube & Uploaded Videos Config (IndexedDB & Server API Fallback)
   const fetchVideosConfig = async () => {
+    // 1. First load from IndexedDB for instant, reliable offline/hosting playback
+    const localVideos = await getLocalVideosConfig();
+    if (localVideos && localVideos.length > 0) {
+      setVideosConfig(localVideos);
+    }
+
+    // 2. Try fetching from server API if hosted with backend
     try {
       const res = await fetch('/api/videos-config');
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data.videos)) {
+        if (Array.isArray(data.videos) && data.videos.length > 0) {
           setVideosConfig(data.videos);
+          await saveLocalVideosConfig(data.videos);
         }
       }
     } catch (e) {
-      console.error('Error fetching videos config:', e);
+      console.log('API videos-config unavailable or offline, using local storage.');
     }
   };
 
@@ -235,6 +244,20 @@ export default function App() {
     setCurrentSection('cover');
   };
 
+  const handleParticipantLogout = () => {
+    if (window.confirm('Apakah Anda yakin ingin keluar dari akun peserta ini? Data identitas dan sesi belajar Anda akan di-reset untuk peserta berikutnya.')) {
+      setUserProgress(INITIAL_PROGRESS);
+      try {
+        localStorage.removeItem('etika_literasi_digital_progress');
+      } catch (e) {
+        console.error(e);
+      }
+      setCurrentSection('cover');
+      setIdentityNotice('✅ Anda telah berhasil keluar dari akun peserta. Silakan isi identitas baru jika peserta lain ingin memulai pembelajaran.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Font size multiplier class
   const fontSizeClass = 
     fontSize === 'large' ? 'text-lg' :
@@ -255,6 +278,7 @@ export default function App() {
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         fontSize={fontSize}
         onChangeFontSize={setFontSize}
+        onParticipantLogout={handleParticipantLogout}
       />
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
@@ -267,6 +291,7 @@ export default function App() {
             userProgress={userProgress}
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
+            onParticipantLogout={handleParticipantLogout}
           />
         )}
 
@@ -280,6 +305,7 @@ export default function App() {
               userProgress={userProgress}
               onUpdateProfile={handleUpdateProfile}
               identityNotice={identityNotice}
+              onParticipantLogout={handleParticipantLogout}
             />
           )}
 
@@ -333,11 +359,17 @@ export default function App() {
           )}
 
           {currentSection === 'certificate' && (
-            <CertificateView userProgress={userProgress} />
+            <CertificateView 
+              userProgress={userProgress} 
+              onParticipantLogout={handleParticipantLogout}
+            />
           )}
 
           {currentSection === 'umpan-balik' && (
-            <UmpanBalikView userProgress={userProgress} />
+            <UmpanBalikView 
+              userProgress={userProgress} 
+              onParticipantLogout={handleParticipantLogout}
+            />
           )}
 
           {currentSection === 'print-pdf' && (
