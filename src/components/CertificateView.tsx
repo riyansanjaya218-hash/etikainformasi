@@ -1,10 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Award, Printer, Lock, ShieldCheck } from 'lucide-react';
+import { Award, Printer, Lock, ShieldCheck, LogOut } from 'lucide-react';
 import { UserProgress, CertificateConfig } from '../types';
+import { EtikaInformasiLogo } from './EtikaInformasiLogo';
+import { OFFICIAL_UNJ_STAMP_SVG } from '../utils/certificateAssets';
 
 interface CertificateViewProps {
   userProgress: UserProgress;
   overrideConfig?: CertificateConfig;
+  onParticipantLogout?: () => void;
 }
 
 const DEFAULT_CONFIG: CertificateConfig = {
@@ -16,12 +19,12 @@ const DEFAULT_CONFIG: CertificateConfig = {
   instructorName: "Riyan Sanjaya, M.Hum.",
   instructorRole: "Tim Dosen Prodi Perpustakaan dan Sains Informasi FIP UNJ",
   signatureUrl: "",
-  stampUrl: "",
+  stampUrl: OFFICIAL_UNJ_STAMP_SVG,
   issueCity: "Jakarta, Indonesia",
   certificatePrefix: "EMOD-LITDIG"
 };
 
-export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, overrideConfig }) => {
+export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, overrideConfig, onParticipantLogout }) => {
   const certRef = useRef<HTMLDivElement>(null);
   const [config, setConfig] = useState<CertificateConfig>(overrideConfig || DEFAULT_CONFIG);
 
@@ -32,13 +35,23 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, 
     }
 
     fetch('/api/certificate-config')
-      .then(res => res.json())
+      .then(res => {
+        if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+          return res.json();
+        }
+        throw new Error('Not JSON');
+      })
       .then(data => {
         if (data.config) {
           setConfig(data.config);
         }
       })
-      .catch(err => console.error('Error fetching cert config:', err));
+      .catch(() => {
+        const savedCert = localStorage.getItem('etika_cert_config_fallback');
+        if (savedCert) {
+          try { setConfig(JSON.parse(savedCert)); } catch (e) {}
+        }
+      });
   }, [overrideConfig]);
 
   const isPassed = userProgress.finalQuizScore !== null && userProgress.finalQuizScore >= 70;
@@ -109,12 +122,10 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, 
               <img 
                 src={config.logoUrl} 
                 alt="Logo Instansi" 
-                className="h-16 w-auto max-w-[200px] object-contain drop-shadow-xs"
+                className="h-11 sm:h-12 w-auto max-w-[150px] object-contain drop-shadow-xs"
               />
             ) : (
-              <div className="w-14 h-14 bg-[#1A1A1A] text-white border-2 border-amber-600 flex items-center justify-center font-serif font-black text-2xl shadow-md">
-                EM
-              </div>
+              <EtikaInformasiLogo isDark={false} showBackgroundCircle={false} className="w-32 sm:w-36 h-auto mx-auto" />
             )}
           </div>
           <h3 className="text-xs sm:text-sm font-serif font-bold uppercase tracking-[0.25em] text-stone-800">
@@ -184,19 +195,12 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, 
           <div className="space-y-2 text-center flex flex-col items-center justify-end min-h-[120px]">
             
             {/* Stamp Area */}
-            <div className="h-16 flex items-center justify-center">
-              {config.stampUrl ? (
-                <img 
-                  src={config.stampUrl} 
-                  alt="Stempel Instansi" 
-                  className="h-16 w-auto max-w-[120px] object-contain opacity-90 rotate-[-4deg]"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-full border-2 border-dashed border-amber-800 text-amber-800 flex flex-col items-center justify-center text-[8px] font-bold leading-tight rotate-[-6deg] bg-amber-50/50 p-1">
-                  <ShieldCheck className="w-4 h-4 text-amber-700 mb-0.5" />
-                  <span>STEMPEL RESMI</span>
-                </div>
-              )}
+            <div className="h-20 flex items-center justify-center">
+              <img 
+                src={config.stampUrl || OFFICIAL_UNJ_STAMP_SVG} 
+                alt="Stempel Resmi FIP UNJ" 
+                className="h-20 w-auto max-w-[130px] object-contain opacity-90 rotate-[-4deg]"
+              />
             </div>
 
             <div className="space-y-0.5">
@@ -216,6 +220,29 @@ export const CertificateView: React.FC<CertificateViewProps> = ({ userProgress, 
         </div>
 
       </div>
+
+      {/* Selesai Pembelajaran & Logout Banner */}
+      {onParticipantLogout && (
+        <div className="p-5 bg-[#F9F7F2] dark:bg-[#1A1A18] border-l-4 border-rose-600 flex flex-col sm:flex-row items-center justify-between gap-4 font-sans shadow-md">
+          <div className="space-y-1 text-center sm:text-left">
+            <h4 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-base flex items-center justify-center sm:justify-start gap-2">
+              <LogOut className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+              <span>Selesai Mengunduh Sertifikat & Ingin Keluar?</span>
+            </h4>
+            <p className="text-xs text-stone-600 dark:text-stone-400 max-w-xl">
+              Selamat atas kelulusan Anda! Jika Anda telah menyimpan/mencetak sertifikat dan ingin menyelesaikan pembelajaran, klik tombol logout di bawah ini untuk mengakhiri sesi.
+            </p>
+          </div>
+
+          <button
+            onClick={onParticipantLogout}
+            className="px-6 py-3 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shrink-0 cursor-pointer shadow-sm"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Selesai & Logout Peserta</span>
+          </button>
+        </div>
+      )}
 
     </div>
   );
