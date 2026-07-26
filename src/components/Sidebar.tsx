@@ -14,7 +14,8 @@ import {
   Sparkles,
   ShieldCheck,
   FileSearch,
-  Lock
+  Lock,
+  LogOut
 } from 'lucide-react';
 import { SectionId, UserProgress } from '../types';
 import { UNITS_DATA, BADGES_LIST } from '../data/modulData';
@@ -25,6 +26,7 @@ interface SidebarProps {
   userProgress: UserProgress;
   isOpen: boolean;
   onClose: () => void;
+  onParticipantLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -32,7 +34,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectSection,
   userProgress,
   isOpen,
-  onClose
+  onClose,
+  onParticipantLogout
 }) => {
   const hasIdentity = Boolean(userProgress.studentName && userProgress.studentName.trim().length > 0);
 
@@ -102,11 +105,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span>Isi identitas di Sampul untuk membuka modul</span>
               </p>
             ) : (
-              <div className="pt-2 border-t border-stone-300 dark:border-stone-800 flex items-center justify-between text-[10px] uppercase tracking-wider font-bold text-stone-600 dark:text-stone-400">
-                <span>Lencana:</span>
-                <span className="font-serif italic text-xs text-[#1A1A1A] dark:text-stone-200">
-                  {userProgress.badges.length} / {BADGES_LIST.length}
-                </span>
+              <div className="pt-2 border-t border-stone-300 dark:border-stone-800 space-y-2">
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-wider font-bold text-stone-600 dark:text-stone-400">
+                  <span>Lencana:</span>
+                  <span className="font-serif italic text-xs text-[#1A1A1A] dark:text-stone-200">
+                    {userProgress.badges.length} / {BADGES_LIST.length}
+                  </span>
+                </div>
+                {onParticipantLogout && (
+                  <button
+                    onClick={() => {
+                      onParticipantLogout();
+                      onClose();
+                    }}
+                    className="w-full py-1.5 px-2.5 bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 dark:hover:bg-rose-900 text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-800 text-[10px] uppercase font-bold tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                    <span>Keluar / Logout Peserta</span>
+                  </button>
+                )}
               </div>
             )}
           </div>
