@@ -224,8 +224,8 @@ let videosConfig = [
     id: 'unit-1',
     sectionName: 'Unit 1: Mengenal Etika Informasi di Era Digital',
     title: 'Pengantar Unit 1: Mengapa Etika Informasi Penting di Era Digital?',
-    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    youtubeUrl: 'https://drive.google.com/file/d/1TyuUokbOd0NlrRGDs2uTGznF2FMDGUam/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1TyuUokbOd0NlrRGDs2uTGznF2FMDGUam/view?usp=sharing',
     duration: '4:15 menit',
     summary: 'Video perkenalan mengenai pentingnya etika informasi, dampak pelanggaran di era internet, dan tanggung jawab kita sebagai warga digital.'
   },
@@ -233,8 +233,8 @@ let videosConfig = [
     id: 'unit-2',
     sectionName: 'Unit 2: Menjadi Detektif Informasi (Verifikasi Hoaks)',
     title: 'Pengantar Unit 2: Yuk, Jadi Detektif Informasi!',
-    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    youtubeUrl: 'https://drive.google.com/file/d/1qvJMwDtslF_NEAfIVj5WsoEObOZWQ3L8/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1qvJMwDtslF_NEAfIVj5WsoEObOZWQ3L8/view?usp=sharing',
     duration: '5:30 menit',
     summary: 'Panduan menjadi detektif informasi yang kritis, mengenali manipulasi konten AI, dan menguasai teknik verifikasi cepat.'
   },
@@ -242,8 +242,8 @@ let videosConfig = [
     id: 'unit-3',
     sectionName: 'Unit 3: Menjaga Privasi & Keamanan Digital',
     title: 'Pengantar Unit 3: Data Pribadimu, Harta Berharga di Dunia Digital',
-    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    youtubeUrl: 'https://drive.google.com/file/d/1LSm-r3m-8XfPNVPKQhJDA1ssE_Z1Mz1O/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1LSm-r3m-8XfPNVPKQhJDA1ssE_Z1Mz1O/view?usp=sharing',
     duration: '6:10 menit',
     summary: 'Penjelasan mengenai pentingnya kerahasiaan data pribadi, bahaya phishing dan social engineering, serta cara mengamankan akun.'
   },
@@ -251,8 +251,8 @@ let videosConfig = [
     id: 'unit-4',
     sectionName: 'Unit 4: Menghargai Karya Orang Lain (Hak Cipta & AI)',
     title: 'Pengantar Unit 4: Menghargai Karya, Menjunjung Integritas',
-    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    youtubeUrl: 'https://drive.google.com/file/d/1pPkvpjgkP8TiMCvG4KGXE77qwQK9cp1i/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1pPkvpjgkP8TiMCvG4KGXE77qwQK9cp1i/view?usp=sharing',
     duration: '5:45 menit',
     summary: 'Mengapa kejujuran akademik sangat penting dan bagaimana memanfaatkan teknologi AI tanpa melakukan tindakan plagiarisme.'
   },
@@ -260,8 +260,8 @@ let videosConfig = [
     id: 'unit-5',
     sectionName: 'Unit 5: Bijak Bersosial Media',
     title: 'Pengantar Unit 5: Bijak Bersosial Media di Ruang Publik Digital',
-    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    youtubeUrl: 'https://drive.google.com/file/d/1OYjuuE2gLto5N_osLOs3iv64qUI090kk/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1OYjuuE2gLto5N_osLOs3iv64qUI090kk/view?usp=sharing',
     duration: '4:50 menit',
     summary: 'Etika bersosialisasi online, menghentikan rantai perundungan siber, dan membangun komunikasi yang inklusif.'
   }
