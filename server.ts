@@ -221,8 +221,8 @@ let videosConfig = [
     id: 'intro',
     sectionName: 'Video Pengantar E-Modul (Halaman Petunjuk)',
     title: 'Video Perkenalan E-Modul “Jelajah Digital”',
-    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    youtubeUrl: 'https://drive.google.com/file/d/1i9XfFMP9rYmV59UkuvDvaaYI9Pl58ZQ3/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1i9XfFMP9rYmV59UkuvDvaaYI9Pl58ZQ3/view?usp=sharing',
     duration: '3:45 menit',
     summary: 'Penjelasan latar belakang e-modul, gambaran 5 unit interaktif, serta pesan moral pentingnya generasi kritis di era banjir informasi.'
   },
