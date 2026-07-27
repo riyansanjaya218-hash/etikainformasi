@@ -27,7 +27,7 @@ interface PetunjukViewProps {
 
 export const PetunjukView: React.FC<PetunjukViewProps> = ({ onSelectSection, videoInfo }) => {
   const video = videoInfo || {
-    embedUrl: 'https://drive.google.com/file/d/1i9XfFMP9rYmV59UkuvDvaaYI9Pl58ZQ3/view?usp=sharing',
+    embedUrl: 'https://drive.google.com/file/d/1i9XfFMP9rYmV59UkuvDvaaYI9Pl58ZQ3/preview',
     title: 'Video Perkenalan E-Modul “Jelajah Digital”',
     duration: '3:45 menit',
     summary: 'Penjelasan latar belakang e-modul, gambaran 5 unit interaktif, serta pesan moral pentingnya generasi kritis di era banjir informasi.'
