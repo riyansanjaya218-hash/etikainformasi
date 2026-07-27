@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { BookOpen, Sparkles, Map, Printer, CheckCircle, ArrowRight, ShieldCheck, Award, User, Lock, AlertTriangle, FileText, ArrowDown, LogOut } from 'lucide-react';
+import { BookOpen, Sparkles, Map, Printer, CheckCircle, ArrowRight, ShieldCheck, Award, User, Lock, AlertTriangle, FileText, ArrowDown } from 'lucide-react';
 import { SectionId, UserProgress } from '../types';
 import { EtikaInformasiLogo } from './EtikaInformasiLogo';
 
@@ -8,7 +8,6 @@ interface CoverViewProps {
   userProgress: UserProgress;
   onUpdateProfile: (name: string, studentClass: string, studentEmail?: string) => void;
   identityNotice?: string | null;
-  onParticipantLogout?: () => void;
 }
 
 export const CoverView: React.FC<CoverViewProps> = ({
@@ -16,7 +15,6 @@ export const CoverView: React.FC<CoverViewProps> = ({
   userProgress,
   onUpdateProfile,
   identityNotice,
-  onParticipantLogout
 }) => {
   const [nameInput, setNameInput] = useState(userProgress.studentName || '');
   const [classInput, setClassInput] = useState(userProgress.studentClass || '');
@@ -80,21 +78,9 @@ export const CoverView: React.FC<CoverViewProps> = ({
               Identitas Peserta Terdaftar: <strong>{userProgress.studentName}</strong> {userProgress.studentClass ? `(${userProgress.studentClass})` : ''}
             </span>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="px-2.5 py-1 bg-emerald-700 text-white font-mono text-[10px] font-bold uppercase tracking-wider">
-              AKSES MODUL TERBUKA
-            </span>
-            {onParticipantLogout && (
-              <button
-                onClick={onParticipantLogout}
-                className="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 dark:bg-rose-950 dark:hover:bg-rose-900 dark:text-rose-200 dark:border-rose-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 transition-colors cursor-pointer"
-                title="Keluar dari akun peserta ini"
-              >
-                <LogOut className="w-3 h-3 text-rose-600 dark:text-rose-400" />
-                <span>Logout</span>
-              </button>
-            )}
-          </div>
+          <span className="px-2.5 py-0.5 bg-emerald-700 text-white font-mono text-[10px] font-bold uppercase tracking-wider shrink-0">
+            AKSES MODUL TERBUKA
+          </span>
         </div>
       )}
 
@@ -265,26 +251,13 @@ export const CoverView: React.FC<CoverViewProps> = ({
           </div>
 
           <div className="sm:col-span-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-[#1A1A1A] text-white hover:bg-stone-800 dark:bg-stone-200 dark:text-black dark:hover:bg-white text-xs uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-              >
-                <CheckCircle className="w-4 h-4 text-emerald-400 dark:text-emerald-700" />
-                <span>Simpan Identitas & Buka Akses Modul</span>
-              </button>
-
-              {hasIdentity && onParticipantLogout && (
-                <button
-                  type="button"
-                  onClick={onParticipantLogout}
-                  className="px-4 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 dark:bg-rose-950 dark:hover:bg-rose-900 dark:text-rose-200 dark:border-rose-800 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                  <span>Logout / Ganti Peserta</span>
-                </button>
-              )}
-            </div>
+            <button
+              type="submit"
+              className="px-6 py-2.5 bg-[#1A1A1A] text-white hover:bg-stone-800 dark:bg-stone-200 dark:text-black dark:hover:bg-white text-xs uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            >
+              <CheckCircle className="w-4 h-4 text-emerald-400 dark:text-emerald-700" />
+              <span>Simpan Identitas & Buka Akses Modul</span>
+            </button>
 
             {isSaved && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 animate-fade-in">
@@ -304,28 +277,6 @@ export const CoverView: React.FC<CoverViewProps> = ({
           </div>
         </form>
       </div>
-
-      {/* Finished Learning Logout Card for Participants */}
-      {hasIdentity && onParticipantLogout && (
-        <div className="p-5 bg-stone-200/70 dark:bg-stone-900/80 border-l-4 border-rose-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-sans">
-          <div className="space-y-1">
-            <h4 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-sm flex items-center gap-2">
-              <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-              <span>Selesai Pembelajaran & Ingin Keluar?</span>
-            </h4>
-            <p className="text-xs text-stone-600 dark:text-stone-400">
-              Jika Anda telah selesai mempelajari modul atau menggunakan komputer bersama, silakan klik tombol logout untuk mengakhiri sesi peserta <strong>({userProgress.studentName})</strong>.
-            </p>
-          </div>
-          <button
-            onClick={onParticipantLogout}
-            className="px-5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shrink-0 cursor-pointer shadow-xs"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Selesai & Logout Peserta</span>
-          </button>
-        </div>
-      )}
 
       {/* Features Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-sans">
